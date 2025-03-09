@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Show Your Love!</title>
+    <title>Relationship Finder</title>
     <style>
         body {
             display: flex;
@@ -13,29 +13,64 @@
             height: 100vh;
             background-color: #f0f8ff;
             font-family: Arial, sans-serif;
-            text-align: center;
         }
         h1 {
-            color: #ff69b4; /* Hot pink */
-            margin-bottom: 20px;
+            color: #4CAF50;
         }
-        p {
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
             font-size: 20px;
             color: #333;
-            margin-bottom: 30px;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 <body>
-    <h1>Show Your Love!</h1>
-    <p>Cheering for you!</p>
-    <img src="https://via.placeholder.com/400x300.png?text=Cheering+Image" alt="Cheering Image">
+    <h1>Find Your Relationship</h1>
+    <input type="text" id="nameInput" placeholder="Enter your name" />
+    <button onclick="findRelationship()">Submit</button>
+    <div class="result" id="result"></div>
+
+    <script>
+        function findRelationship() {
+            const name = document.getElementById('nameInput').value.trim();
+            const resultDiv = document.getElementById('result');
+
+            // Define relationships
+            const relationships = {
+                "Jyoti": "Sister",
+                "Pooja": "Sister",
+                "S P Verma": "Father",
+                "Munni Verma": "Mother",
+                "Divyansh": "Niece",
+                "Kriyansh": "Niece",
+                "Aaru": "Bestie"
+            };
+
+            // Check if the name exists in the relationships object
+            if (relationships[name]) {
+                resultDiv.innerHTML = `Your relationship is: ${relationships[name]}`;
+            } else {
+                resultDiv.innerHTML = `There is no relation between ${name} and you.`;
+            }
+        }
+    </script>
 </body>
 </html>
 
