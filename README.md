@@ -3,38 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Congratulations</title>
+    <title>Show Your Love!</title>
     <style>
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             background-color: #f0f8ff;
             font-family: Arial, sans-serif;
-        }
-        .congratulations {
             text-align: center;
-            padding: 20px;
-            border: 2px solid #4CAF50;
-            border-radius: 10px;
-            background-color: #ffffff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         h1 {
-            color: #4CAF50;
+            color: #ff69b4; /* Hot pink */
+            margin-bottom: 20px;
         }
         p {
-            font-size: 18px;
+            font-size: 20px;
             color: #333;
+            margin-bottom: 30px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 <body>
-    <div class="congratulations">
-        <h1>Congratulations!</h1>
-        <p>For your hard work, Mrs. Jyoti!</p>
-    </div>
+    <h1>Show Your Love!</h1>
+    <p>Cheering for you!</p>
+    <img src="https://via.placeholder.com/400x300.png?text=Cheering+Image" alt="Cheering Image">
 </body>
 </html>
 
