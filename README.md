@@ -34,8 +34,10 @@
             transform: scale(1.1);
         }
         .burst {
-            background-color: transparent;
-            border: 2px solid #ff4081;
+            background-image: url('https://i.imgur.com/1Z5Z5gD.png'); /* URL of the bursting balloon image */
+            background-size: cover;
+            width: 70px; /* Adjust size as needed */
+            height: 70px; /* Adjust size as needed */
             animation: burst 0.5s forwards;
         }
         @keyframes burst {
