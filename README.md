@@ -24,8 +24,8 @@
         .balloon {
             width: 50px;
             height: 70px;
-            background-color: #ff4081;
-            border-radius: 50% 50% 0 0;
+            background-image: url('https://i.imgur.com/8Q8Z8gD.png'); /* Balloon image */
+            background-size: cover;
             position: absolute;
             cursor: pointer;
             transition: transform 0.2s;
@@ -34,7 +34,7 @@
             transform: scale(1.1);
         }
         .burst {
-            background-image: url('https://i.imgur.com/1Z5Z5gD.png'); /* URL of the bursting balloon image */
+            background-image: url('https://i.imgur.com/1Z5Z5gD.png'); /* Bursting balloon image */
             background-size: cover;
             width: 70px; /* Adjust size as needed */
             height: 70px; /* Adjust size as needed */
@@ -43,6 +43,18 @@
         @keyframes burst {
             0% { transform: scale(1); }
             100% { transform: scale(0); }
+        }
+        .water-drop {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: rgba(0, 162, 232, 0.7); /* Water drop color */
+            border-radius: 50%;
+            animation: splash 0.5s forwards;
+        }
+        @keyframes splash {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0); opacity: 0; }
         }
     </style>
 </head>
@@ -61,29 +73,27 @@
 
             balloon.addEventListener('click', () => {
                 balloon.classList.add('burst');
+                createWaterDrops(balloon.style.left, balloon.style.top);
                 setTimeout(() => {
                     balloon.remove();
                 }, 500);
-                displayMessage();
             });
 
             balloonContainer.appendChild(balloon);
         }
 
-        function displayMessage() {
-            const message = document.createElement('div');
-            message.innerText = "Splash! 🎉";
-            message.style.position = 'absolute';
-            message.style.top = Math.random() * (window.innerHeight - 100) + 'px';
-            message.style.left = Math.random() * (window.innerWidth - 100) + 'px';
-            message.style.fontSize = '24px';
-            message.style.color = '#ff5722';
-            message.style.pointerEvents = 'none';
-            document.body.appendChild(message);
+        function createWaterDrops(left, top) {
+            for (let i = 0; i < 10; i++) {
+                const drop = document.createElement('div');
+                drop.classList.add('water-drop');
+                drop.style.left = parseInt(left) + Math.random() * 50 + 'px';
+                drop.style.top = parseInt(top) + Math.random() * 50 + 'px';
+                document.body.appendChild(drop);
 
-            setTimeout(() => {
-                message.remove();
-            }, 1000);
+                setTimeout(() => {
+                    drop.remove();
+                }, 500);
+            }
         }
 
         // Create balloons at intervals
