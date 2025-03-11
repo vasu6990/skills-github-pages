@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relationship Finder</title>
+    <title>Happy Holi!</title>
     <style>
         body {
             display: flex;
@@ -11,65 +11,81 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f8ff;
+            background-color: #f0e68c;
+            margin: 0;
             font-family: Arial, sans-serif;
+            overflow: hidden;
         }
         h1 {
-            color: #4CAF50;
+            color: #ff5722;
+            font-size: 48px;
+            margin-bottom: 20px;
         }
-        input {
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        .balloon {
+            width: 50px;
+            height: 70px;
+            background-color: #ff4081;
+            border-radius: 50% 50% 0 0;
+            position: absolute;
             cursor: pointer;
+            transition: transform 0.2s;
         }
-        button:hover {
-            background-color: #45a049;
+        .balloon:hover {
+            transform: scale(1.1);
         }
-        .result {
-            margin-top: 20px;
-            font-size: 20px;
-            color: #333;
+        .burst {
+            background-color: transparent;
+            border: 2px solid #ff4081;
+            animation: burst 0.5s forwards;
+        }
+        @keyframes burst {
+            0% { transform: scale(1); }
+            100% { transform: scale(0); }
         }
     </style>
 </head>
 <body>
-    <h1>Find Your Relationship</h1>
-    <input type="text" id="nameInput" placeholder="Enter your name" />
-    <button onclick="findRelationship()">Submit</button>
-    <div class="result" id="result"></div>
+    <h1>Happy Holi!</h1>
+    <div id="balloonContainer"></div>
 
     <script>
-        function findRelationship() {
-            const name = document.getElementById('nameInput').value.trim();
-            const resultDiv = document.getElementById('result');
+        const balloonContainer = document.getElementById('balloonContainer');
 
-            // Define relationships
-            const relationships = {
-                "Jyoti": "Sister",
-                "Pooja": "Sister",
-                "S P Verma": "Father",
-                "Munni Verma": "Mother",
-                "Divyansh": "Niece",
-                "Kriyansh": "Niece",
-                "Aaru": "Bestie"
-            };
+        function createBalloon() {
+            const balloon = document.createElement('div');
+            balloon.classList.add('balloon');
+            balloon.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+            balloon.style.top = Math.random() * (window.innerHeight - 100) + 'px';
 
-            // Check if the name exists in the relationships object
-            if (relationships[name]) {
-                resultDiv.innerHTML = `Your relationship is: ${relationships[name]}`;
-            } else {
-                resultDiv.innerHTML = `There is no relation between ${name} and you.`;
-            }
+            balloon.addEventListener('click', () => {
+                balloon.classList.add('burst');
+                setTimeout(() => {
+                    balloon.remove();
+                }, 500);
+                displayMessage();
+            });
+
+            balloonContainer.appendChild(balloon);
         }
+
+        function displayMessage() {
+            const message = document.createElement('div');
+            message.innerText = "Splash! 🎉";
+            message.style.position = 'absolute';
+            message.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+            message.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+            message.style.fontSize = '24px';
+            message.style.color = '#ff5722';
+            message.style.pointerEvents = 'none';
+            document.body.appendChild(message);
+
+            setTimeout(() => {
+                message.remove();
+            }, 1000);
+        }
+
+        // Create balloons at intervals
+        setInterval(createBalloon, 1000);
     </script>
 </body>
 </html>
