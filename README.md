@@ -84,21 +84,4 @@
 
         function createWaterDrops(left, top) {
             for (let i = 0; i < 10; i++) {
-                const drop = document.createElement('div');
-                drop.classList.add('water-drop');
-                drop.style.left = parseInt(left) + Math.random() * 50 + 'px';
-                drop.style.top = parseInt(top) + Math.random() * 50 + 'px';
-                document.body.appendChild(drop);
-
-                setTimeout(() => {
-                    drop.remove();
-                }, 500);
-            }
-        }
-
-        // Create balloons at intervals
-        setInterval(createBalloon, 1000);
-    </script>
-</body>
-</html>
-
+               
