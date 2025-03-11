@@ -11,15 +11,24 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0e68c;
             margin: 0;
             font-family: Arial, sans-serif;
             overflow: hidden;
+            background-image: url('https://i.imgur.com/8Q8Z8gD.png'); /* Background image for Holi */
+            background-size: cover;
+            background-position: center;
+            color: white; /* Change text color for better visibility */
         }
         h1 {
-            color: #ff5722;
             font-size: 48px;
             margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Add shadow for better visibility */
+        }
+        .quote {
+            font-size: 24px;
+            margin-bottom: 40px;
+            text-align: center;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Add shadow for better visibility */
         }
         .balloon {
             width: 50px;
@@ -29,9 +38,6 @@
             position: absolute;
             cursor: pointer;
             transition: transform 0.2s;
-        }
-        .balloon:hover {
-            transform: scale(1.1);
         }
         .burst {
             background-image: url('https://i.imgur.com/1Z5Z5gD.png'); /* Bursting balloon image */
@@ -44,44 +50,44 @@
             0% { transform: scale(1); }
             100% { transform: scale(0); }
         }
-        .water-drop {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: rgba(0, 162, 232, 0.7); /* Water drop color */
-            border-radius: 50%;
-            animation: splash 0.5s forwards;
-        }
-        @keyframes splash {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(0); opacity: 0; }
-        }
     </style>
 </head>
 <body>
-    <h1>Happy Holi!</h1>
+    <h1>Happy Holi from Vasu!</h1>
+    <div class="quote" id="quote"></div>
     <div id="balloonContainer"></div>
 
     <script>
-        const balloonContainer = document.getElementById('balloonContainer');
+        const quotes = [
+            "Let the colors of Holi spread the message of peace and happiness.",
+            "Holi is the time to break the ice and renew relationships.",
+            "May your life be filled with vibrant colors of joy and happiness.",
+            "Celebrate life with colors of joy and happiness.",
+            "Wishing you a Holi filled with sweet memories and moments to cherish."
+        ];
 
-        function createBalloon() {
+        // Display a random quote
+        document.getElementById('quote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+
+        // Function to create a balloon
+        function createBalloon(x, y) {
             const balloon = document.createElement('div');
             balloon.classList.add('balloon');
-            balloon.style.left = Math.random() * (window.innerWidth - 50) + 'px';
-            balloon.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+            balloon.style.left = x + 'px';
+            balloon.style.top = y + 'px';
 
-            balloon.addEventListener('click', () => {
-                balloon.classList.add('burst');
-                createWaterDrops(balloon.style.left, balloon.style.top);
-                setTimeout(() => {
-                    balloon.remove();
-                }, 500);
-            });
+            balloon.classList.add('burst');
+            setTimeout(() => {
+                balloon.remove();
+            }, 500);
 
-            balloonContainer.appendChild(balloon);
+            document.getElementById('balloonContainer').appendChild(balloon);
         }
 
-        function createWaterDrops(left, top) {
-            for (let i = 0; i < 10; i++) {
-               
+        // Event listener for clicks
+        document.addEventListener('click', (event) => {
+            createBalloon(event.clientX - 25, event.clientY - 35); // Adjust position to center the balloon
+        });
+    </script>
+</body>
+</html>
