@@ -129,4 +129,21 @@
         }
 
         // Move car left and right by tapping
-        canvas.add
+        canvas.addEventListener('touchstart', function(event) {
+            const touchX = event.touches[0].clientX; // Get touch position
+            if (touchX < canvas.width / 2 && carX > 0) {
+                carX -= 15; // Move left
+            } else if (touchX > canvas.width / 2 && carX < (canvas.width - carWidth)) {
+                carX += 15; // Move right
+            }
+        });
+
+        // Resize canvas on window resize
+        window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            carX = canvas.width / 2 - carWidth / 2; // Reset car position
+        });
+    </script>
+</body>
+</html>
