@@ -3,150 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car Game</title>
+    <title>Mobile Car Game</title>
     <style>
         body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
             margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-        }
-        #gameArea {
-            position: relative;
-            width: 300px;
-            height: 500px;
-            border: 2px solid #333;
             overflow: hidden;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #gameCanvas {
+            display: block;
             background-color: #e0e0e0;
         }
-        .car {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 100px;
-            background-color: blue;
-        }
-        .obstacle {
-            position: absolute;
-            width: 50px;
-            height: 100px;
-            background-color: red;
-        }
         .button {
-            margin: 10px;
-            padding: 10px 20px;
+            position: absolute;
+            bottom: 20px;
+            width: 100px;
+            height: 50px;
             background-color: #28a745;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
         }
         .button:hover {
             background-color: #218838;
         }
+        #easy { left: 20px; }
+        #medium { left: 130px; }
+        #hard { left: 240px; }
         #gameOver {
             display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             font-size: 24px;
             color: red;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <h1>Car Game</h1>
-    <button class="button" onclick="startGame('easy')">Easy</button>
-    <button class="button" onclick="startGame('medium')">Medium</button>
-    <button class="button" onclick="startGame('hard')">Hard</button>
-    <div id="gameArea">
-        <div class="car" id="car"></div>
-        <div id="gameOver">Game Over!</div>
-    </div>
+    <canvas id="gameCanvas"></canvas>
+    <div id="gameOver">Game Over!<br><button onclick="restartGame()">Restart</button></div>
+    <button class="button" id="easy" onclick="startGame('easy')">Easy</button>
+    <button class="button" id="medium" onclick="startGame('medium')">Medium</button>
+    <button class="button" id="hard" onclick="startGame('hard')">Hard</button>
 
     <script>
-        let gameInterval;
-        let obstacleInterval;
-        let car;
-        let gameArea;
-        let gameOverText;
-        let speed = 2; // Base speed for obstacles
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let carX, carY;
+        const carWidth = 50;
+        const carHeight = 100;
+        let obstacles = [];
+        let speed = 2;
         let isGameOver = false;
+        let gameInterval;
 
         function startGame(difficulty) {
             isGameOver = false;
-            speed = difficulty === 'easy' ? 2 : difficulty === 'medium' ? 4 : 6;
-            car = document.getElementById('car');
-            gameArea = document.getElementById('gameArea');
-            gameOverText = document.getElementById('gameOver');
-            gameOverText.style.display = 'none';
-            car.style.left = '125px'; // Reset car position
+            obstacles = [];
+            carX = canvas.width / 2 - carWidth / 2;
+            carY = canvas.height - carHeight - 10;
 
+            speed = difficulty === 'easy' ? 2 : difficulty === 'medium' ? 4 : 6;
+
+            document.getElementById('gameOver').style.display = 'none';
             clearInterval(gameInterval);
-            clearInterval(obstacleInterval);
-            gameInterval = setInterval(moveObstacles, 20);
-            obstacleInterval = setInterval(createObstacle, 2000);
+            gameInterval = setInterval(gameLoop, 20);
+            createObstacle();
         }
 
-        function moveObstacles() {
-            const obstacles = document.querySelectorAll('.obstacle');
-            obstacles.forEach(obstacle => {
-                let obstacleTop = parseInt(window.getComputedStyle(obstacle).getPropertyValue('top'));
-                obstacle.style.top = (obstacleTop + speed) + 'px';
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawCar();
+            moveObstacles();
+            checkCollision();
+        }
 
-                // Check for collision
-                if (obstacleTop > 500) {
-                    obstacle.remove(); // Remove obstacle if it goes out of view
-                }
-
-                // Collision detection
-                if (isCollision(car, obstacle)) {
-                    endGame();
-                }
-            });
+        function drawCar() {
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(carX, carY, carWidth, carHeight);
         }
 
         function createObstacle() {
-            const obstacle = document.createElement('div');
-            obstacle.classList.add('obstacle');
-            obstacle.style.left = Math.random() * (gameArea.clientWidth - 50) + 'px'; // Random position
-            obstacle.style.top = '0px'; // Start from the top
-            gameArea.appendChild(obstacle);
+            const obstacleX = Math.random() * (canvas.width - 50);
+            obstacles.push({ x: obstacleX, y: 0, width: 50, height: 100 });
+            setTimeout(createObstacle, 2000); // Create a new obstacle every 2 seconds
         }
 
-        function isCollision(car, obstacle) {
-            const carRect = car.getBoundingClientRect();
-            const obstacleRect = obstacle.getBoundingClientRect();
+        function moveObstacles() {
+            obstacles.forEach(obstacle => {
+                obstacle.y += speed;
+                ctx.fillStyle = 'red';
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            });
+            obstacles = obstacles.filter(obstacle => obstacle.y < canvas.height); // Remove off-screen obstacles
+        }
 
-            return !(
-                carRect.top > obstacleRect.bottom ||
-                carRect.bottom < obstacleRect.top ||
-                carRect.right < obstacleRect.left ||
-                carRect.left > obstacleRect.right
-            );
+        function checkCollision() {
+            for (let obstacle of obstacles) {
+                if (carX < obstacle.x + obstacle.width &&
+                    carX + carWidth > obstacle.x &&
+                    carY < obstacle.y + obstacle.height &&
+                    carY + carHeight > obstacle.y) {
+                    endGame();
+                }
+            }
         }
 
         function endGame() {
             isGameOver = true;
             clearInterval(gameInterval);
-            clearInterval(obstacleInterval);
-            gameOverText.style.display = 'block';
+            document.getElementById('gameOver').style.display = 'block';
         }
 
-        // Move car left and right
-        document.addEventListener('keydown', (event) => {
-            if (!isGameOver) {
-                const carLeft = parseInt(window.getComputedStyle(car).getPropertyValue('left'));
-                if (event.key === 'ArrowLeft' && carLeft > 0) {
-                    car.style.left = (carLeft - 15) + 'px'; // Move left
-                } else if (event.key === 'ArrowRight' && carLeft < (gameArea.clientWidth - 50)) {
-                    car.style.left = (carLeft + 15) + 'px'; // Move right
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+        function restartGame() {
+            startGame('easy'); // Restart in easy mode; you can change this as needed
+        }
+
+        // Move car left and right by tapping
+        canvas.add
