@@ -3,36 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobile Car Game</title>
+    <title>Flappy Bird Clone</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
+            background-color: #70c5ce; /* Sky color */
         }
         #gameCanvas {
             display: block;
-            background-color: #e0e0e0;
+            background-color: #70c5ce; /* Sky color */
+            margin: 0 auto;
+            position: relative;
         }
-        .button {
+        .bird {
             position: absolute;
-            bottom: 20px;
-            width: 100px;
-            height: 50px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
+            width: 40px;
+            height: 40px;
+            background-color: yellow; /* Bird color */
+            border-radius: 50%; /* Make it round */
         }
-        .button:hover {
-            background-color: #218838;
+        .pipe {
+            position: absolute;
+            background-color: green; /* Pipe color */
         }
-        #easy { left: 20px; }
-        #medium { left: 130px; }
-        #hard { left: 240px; }
         #gameOver {
             display: none;
             position: absolute;
@@ -46,104 +40,116 @@
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
     <div id="gameOver">Game Over!<br><button onclick="restartGame()">Restart</button></div>
-    <button class="button" id="easy" onclick="startGame('easy')">Easy</button>
-    <button class="button" id="medium" onclick="startGame('medium')">Medium</button>
-    <button class="button" id="hard" onclick="startGame('hard')">Hard</button>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
 
-        let carX, carY;
-        const carWidth = 50;
-        const carHeight = 100;
-        let obstacles = [];
-        let speed = 2;
+        let birdY = canvas.height / 2;
+        let birdVelocity = 0;
+        const gravity = 0.5;
+        const jump = -10;
+        const birdWidth = 40;
+        const birdHeight = 40;
+        let pipes = [];
+        let pipeWidth = 50;
+        let pipeGap = 150;
+        let frame = 0;
+        let score = 0;
         let isGameOver = false;
-        let gameInterval;
 
-        function startGame(difficulty) {
-            isGameOver = false;
-            obstacles = [];
-            carX = canvas.width / 2 - carWidth / 2;
-            carY = canvas.height - carHeight - 10;
-
-            speed = difficulty === 'easy' ? 2 : difficulty === 'medium' ? 4 : 6;
-
-            document.getElementById('gameOver').style.display = 'none';
-            clearInterval(gameInterval);
-            gameInterval = setInterval(gameLoop, 20);
-            createObstacle();
+        function drawBird() {
+            ctx.fillStyle = 'yellow';
+            ctx.fillRect(50, birdY, birdWidth, birdHeight);
         }
 
-        function gameLoop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawCar();
-            moveObstacles();
-            checkCollision();
-        }
-
-        function drawCar() {
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(carX, carY, carWidth, carHeight);
-        }
-
-        function createObstacle() {
-            const obstacleX = Math.random() * (canvas.width - 50);
-            obstacles.push({ x: obstacleX, y: 0, width: 50, height: 100 });
-            setTimeout(createObstacle, 2000); // Create a new obstacle every 2 seconds
-        }
-
-        function moveObstacles() {
-            obstacles.forEach(obstacle => {
-                obstacle.y += speed;
-                ctx.fillStyle = 'red';
-                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        function drawPipes() {
+            ctx.fillStyle = 'green';
+            pipes.forEach(pipe => {
+                ctx.fillRect(pipe.x, 0, pipeWidth, pipe.top);
+                ctx.fillRect(pipe.x, canvas.height - pipe.bottom, pipeWidth, pipe.bottom);
             });
-            obstacles = obstacles.filter(obstacle => obstacle.y < canvas.height); // Remove off-screen obstacles
+        }
+
+        function updatePipes() {
+            if (frame % 90 === 0) { // Create a new pipe every 90 frames
+                const top = Math.random() * (canvas.height - pipeGap - 20) + 20;
+                const bottom = canvas.height - top - pipeGap;
+                pipes.push({ x: canvas.width, top: top, bottom: bottom });
+            }
+
+            pipes.forEach(pipe => {
+                pipe.x -= 2; // Move pipes to the left
+            });
+
+            // Remove off-screen pipes
+            if (pipes.length && pipes[0].x < -pipeWidth) {
+                pipes.shift();
+                score++;
+            }
         }
 
         function checkCollision() {
-            for (let obstacle of obstacles) {
-                if (carX < obstacle.x + obstacle.width &&
-                    carX + carWidth > obstacle.x &&
-                    carY < obstacle.y + obstacle.height &&
-                    carY + carHeight > obstacle.y) {
+            if (birdY + birdHeight > canvas.height || birdY < 0) {
+                endGame();
+            }
+
+            pipes.forEach(pipe => {
+                if (
+                    50 < pipe.x + pipeWidth &&
+                    50 + birdWidth > pipe.x &&
+                    (birdY < pipe.top || birdY + birdHeight > canvas.height - pipe.bottom)
+                ) {
                     endGame();
                 }
-            }
+            });
         }
 
         function endGame() {
             isGameOver = true;
-            clearInterval(gameInterval);
             document.getElementById('gameOver').style.display = 'block';
         }
 
         function restartGame() {
-            startGame('easy'); // Restart in easy mode; you can change this as needed
+            birdY = canvas.height / 2;
+            birdVelocity = 0;
+            pipes = [];
+            frame = 0;
+            score = 0;
+            isGameOver = false;
+            document.getElementById('gameOver').style.display = 'none';
+            gameLoop();
         }
 
-        // Move car left and right by tapping
-        canvas.addEventListener('touchstart', function(event) {
-            const touchX = event.touches[0].clientX; // Get touch position
-            if (touchX < canvas.width / 2 && carX > 0) {
-                carX -= 15; // Move left
-            } else if (touchX > canvas.width / 2 && carX < (canvas.width - carWidth)) {
-                carX += 15; // Move right
+        function gameLoop() {
+            if (isGameOver) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            birdVelocity += gravity;
+            birdY += birdVelocity;
+
+            drawBird();
+            updatePipes();
+            drawPipes();
+            checkCollision();
+
+            frame++;
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Jump when clicking or tapping
+        canvas.addEventListener('click', () => {
+            if (!isGameOver) {
+                birdVelocity = jump;
+            } else {
+                restartGame();
             }
         });
 
-        // Resize canvas on window resize
-        window.addEventListener('resize', function() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            carX = canvas.width / 2 - carWidth / 2; // Reset car position
-        });
+        // Start the game
+        gameLoop();
     </script>
 </body>
 </html>
