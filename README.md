@@ -139,12 +139,12 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // Jump when clicking or tapping
+        // Jump when clicking or tapping anywhere on the canvas
         canvas.addEventListener('click', () => {
             if (!isGameOver) {
-                birdVelocity = jump;
+                birdVelocity = jump; // Make the bird jump
             } else {
-                restartGame();
+                restartGame(); // Restart the game if it's over
             }
         });
 
