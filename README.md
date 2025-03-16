@@ -28,7 +28,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             font-size: 24px;
             text-align: center;
-            animation: pop 0.5s ease-in-out;
+            animation: pop 0.5s ease-in-out, slideIn 0.5s ease-in-out;
         }
         @keyframes pop {
             0% {
@@ -41,6 +41,16 @@
             }
             100% {
                 transform: scale(1);
+            }
+        }
+        @keyframes slideIn {
+            0% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
             }
         }
         button {
@@ -58,7 +68,7 @@
     </style>
 </head>
 <body>
-    <h1>🎉 जन्मदिन मुबारक हो, Admin Ji! 🎉</h1>
+    <h1>🎉 जन्मदिन मुबारक हो, एडमिन जी! 🎉</h1>
     <button onclick="showMessage()">संदेश दिखाएँ</button>
     <div id="message">
         <p>आपका जन्मदिन सभी समूह के सदस्यों की ओर से बहुत-बहुत मुबारक हो!</p>
@@ -68,6 +78,7 @@
         function showMessage() {
             const messageDiv = document.getElementById('message');
             messageDiv.style.display = 'block'; // Show the message
+            messageDiv.classList.add('show'); // Add class to trigger animation
         }
     </script>
 </body>
