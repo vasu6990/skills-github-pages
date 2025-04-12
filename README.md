@@ -13,7 +13,7 @@
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
         }
-        canvas {
+        #gameCanvas {
             border: 1px solid #000;
             background-color: #fff;
         }
@@ -21,15 +21,15 @@
 </head>
 <body>
 
-<canvas id="snakeGame" width="400" height="400"></canvas>
+<canvas id="gameCanvas" width="400" height="400"></canvas>
 <script>
-    const canvas = document.getElementById('snakeGame');
+    const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
     const box = 20; // Size of the snake and food
     let snake = [{ x: 9 * box, y: 9 * box }]; // Initial position of the snake
     let direction = 'RIGHT'; // Initial direction
-    let food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box }; // Initial food position
+    let food = { x: Math.floor(Math.random() * (canvas.width / box)) * box, y: Math.floor(Math.random() * (canvas.height / box)) * box }; // Initial food position
     let score = 0;
 
     // Draw everything on the canvas
@@ -60,7 +60,7 @@
         // Check if the snake eats the food
         if (snakeX === food.x && snakeY === food.y) {
             score++;
-            food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box }; // New food position
+            food = { x: Math.floor(Math.random() * (canvas.width / box)) * box, y: Math.floor(Math.random() * (canvas.height / box)) * box }; // New food position
         } else {
             snake.pop(); // Remove the last part of the snake
         }
