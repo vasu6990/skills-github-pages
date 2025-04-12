@@ -1,121 +1,102 @@
-import pygame
-import time
-import random
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 1px solid #000;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
 
-# Initialize Pygame
-pygame.init()
+<canvas id="snakeGame" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('snakeGame');
+    const ctx = canvas.getContext('2d');
 
-# Define colors
-white = (255, 255, 255)
-yellow = (255, 255, 102)
-black = (0, 0, 0)
-red = (213, 50, 80)
-green = (0, 255, 0)
-blue = (50, 153, 213)
+    const box = 20; // Size of the snake and food
+    let snake = [{ x: 9 * box, y: 9 * box }]; // Initial position of the snake
+    let direction = 'RIGHT'; // Initial direction
+    let food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box }; // Initial food position
+    let score = 0;
 
-# Set display dimensions
-width = 600
-height = 400
-display = pygame.display.set_mode((width, height))
-pygame.display.set_caption('Snake Game')
+    // Draw everything on the canvas
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
 
-# Set clock
-clock = pygame.time.Clock()
+        // Draw the snake
+        for (let i = 0; i < snake.length; i++) {
+            ctx.fillStyle = (i === 0) ? 'green' : 'lightgreen'; // Head is green, body is light green
+            ctx.fillRect(snake[i].x, snake[i].y, box, box);
+            ctx.strokeStyle = 'darkgreen';
+            ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+        }
 
-# Set snake parameters
-snake_block = 10
-snake_speed = 15
+        // Draw the food
+        ctx.fillStyle = 'red';
+        ctx.fillRect(food.x, food.y, box, box);
 
-# Set font styles
-font_style = pygame.font.SysFont("bahnschrift", 25)
-score_font = pygame.font.SysFont("comicsansms", 35)
+        // Move the snake
+        let snakeX = snake[0].x;
+        let snakeY = snake[0].y;
 
-def our_snake(snake_block, snake_list):
-    for x in snake_list:
-        pygame.draw.rect(display, black, [x[0], x[1], snake_block, snake_block])
+        if (direction === 'LEFT') snakeX -= box;
+        if (direction === 'UP') snakeY -= box;
+        if (direction === 'RIGHT') snakeX += box;
+        if (direction === 'DOWN') snakeY += box;
 
-def message(msg, color):
-    mesg = font_style.render(msg, True, color)
-    display.blit(mesg, [width / 6, height / 3])
+        // Check if the snake eats the food
+        if (snakeX === food.x && snakeY === food.y) {
+            score++;
+            food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box }; // New food position
+        } else {
+            snake.pop(); // Remove the last part of the snake
+        }
 
-def gameLoop():  # Creating a function
-    game_over = False
-    game_close = False
+        // Add new head
+        const newHead = { x: snakeX, y: snakeY };
+        snake.unshift(newHead);
 
-    x1 = width / 2
-    y1 = height / 2
+        // Check for collisions
+        if (snakeX < 0 || snakeY < 0 || snakeX >= canvas.width || snakeY >= canvas.height || collision(newHead, snake)) {
+            clearInterval(game);
+            alert('Game Over! Your score: ' + score);
+        }
+    }
 
-    x1_change = 0
-    y1_change = 0
+    // Check for collision with the snake itself
+    function collision(head, array) {
+        for (let i = 1; i < array.length; i++) {
+            if (head.x === array[i].x && head.y === array[i].y) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-    snake_List = []
-    Length_of_snake = 1
+    // Control the snake with arrow keys
+    document.addEventListener('keydown', event => {
+        if (event.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
+        if (event.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
+        if (event.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
+        if (event.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
+    });
 
-    foodx = round(random.randrange(0, width - snake_block) / 10.0) * 10.0
-    foody = round(random.randrange(0, height - snake_block) / 10.0) * 10.0
+    // Start the game
+    const game = setInterval(draw, 100); // Draw every 100 milliseconds
+</script>
 
-    while not game_over:
-
-        while game_close == True:
-            display.fill(blue)
-            message("You Lost! Press C-Play Again or Q-Quit", red)
-            pygame.display.update()
-
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_q:
-                        game_over = True
-                        game_close = False
-                    if event.key == pygame.K_c:
-                        gameLoop()
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                game_over = True
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    x1_change = -snake_block
-                    y1_change = 0
-                elif event.key == pygame.K_RIGHT:
-                    x1_change = snake_block
-                    y1_change = 0
-                elif event.key == pygame.K_UP:
-                    y1_change = -snake_block
-                    x1_change = 0
-                elif event.key == pygame.K_DOWN:
-                    y1_change = snake_block
-                    x1_change = 0
-
-        if x1 >= width or x1 < 0 or y1 >= height or y1 < 0:
-            game_close = True
-
-        x1 += x1_change
-        y1 += y1_change
-        display.fill(blue)
-        pygame.draw.rect(display, green, [foodx, foody, snake_block, snake_block])
-        snake_Head = []
-        snake_Head.append(x1)
-        snake_Head.append(y1)
-        snake_List.append(snake_Head)
-        if len(snake_List) > Length_of_snake:
-            del snake_List[0]
-
-        for x in snake_List[:-1]:
-            if x == snake_Head:
-                game_close = True
-
-        our_snake(snake_block, snake_List)
-
-        pygame.display.update()
-
-        if x1 == foodx and y1 == foody:
-            foodx = round(random.randrange(0, width - snake_block) / 10.0) * 10.0
-            foody = round(random.randrange(0, height - snake_block) / 10.0) * 10.0
-            Length_of_snake += 1
-
-        clock.tick(snake_speed)
-
-    pygame.quit()
-    quit()
-
-gameLoop()
+</body>
+</html>
